@@ -41,7 +41,7 @@ Material:
     - _LineWidthPx: 6
     - _MaskThreshold: 0.5
     - _MaxDistPx: 99999
-    - _Opacity: 1
+    - _Opacity: 0.8
     - _PaletteOffset: 0
     - _PaletteTiling: 0.12
     - _PeriodPx: 100

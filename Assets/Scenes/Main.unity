@@ -160,11 +160,26 @@ MonoBehaviour:
   - {fileID: 1531748843}
   overrideColors: 1
   ballColors:
-  - {r: 1, g: 0, b: 0, a: 1}
-  - {r: 1, g: 0, b: 0, a: 1}
-  - {r: 1, g: 0, b: 0, a: 1}
-  - {r: 1, g: 0, b: 0, a: 1}
-  - {r: 1, g: 0, b: 0, a: 1}
+  - r: 1
+    g: 0
+    b: 0
+    a: 1
+  - r: 1
+    g: 0
+    b: 0
+    a: 1
+  - r: 1
+    g: 0
+    b: 0
+    a: 1
+  - r: 1
+    g: 0
+    b: 0
+    a: 1
+  - r: 1
+    g: 0
+    b: 0
+    a: 1
   overrideSizes: 1
   ballSizes:
   - 15
@@ -175,9 +190,15 @@ MonoBehaviour:
   enableRandomMovement: 1
   movementSpeed: 0.5
   movementRange: {x: 16, y: 9}
+  _initialPositions: []
+  _noiseOffsets: []
   overridePosterization: 0
   posterizeSteps: 5
-  outlineColor: {r: 1, g: 1, b: 1, a: 1}
+  outlineColor:
+    r: 1
+    g: 1
+    b: 1
+    a: 1
   outlineWidth: 0.05
   hueShift: 0
   saturation: 0.933
@@ -506,6 +527,7 @@ GameObject:
   - component: {fileID: 470718642}
   - component: {fileID: 470718641}
   - component: {fileID: 470718645}
+  - component: {fileID: 470718646}
   m_Layer: 6
   m_Name: Plane (1)
   m_TagString: Untagged
@@ -614,6 +636,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jfaDistanceField: {fileID: 1038889799}
   material: {fileID: 2100000, guid: 52a2fc288c7ce734b8f416cffd0be2be, type: 2}
+--- !u!210 &470718646
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470718640}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 100
+  m_SortAtRoot: 0
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -695,7 +729,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.45911938, g: 0.45911938, b: 0.45911938, a: 0}
+  m_BackGroundColor: {r: 0.23584908, g: 0.23584908, b: 0.23584908, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
