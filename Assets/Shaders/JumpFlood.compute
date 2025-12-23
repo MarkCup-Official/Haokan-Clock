@@ -1,0 +1,138 @@
+// JumpFlood.compute
+#pragma kernel KInit
+#pragma kernel KJump
+#pragma kernel KDistance
+#pragma kernel KSmooth
+
+Texture2D<float4> _Mask;              // 你的 maskRT（作为 Texture 输入）
+SamplerState sampler_PointClamp;
+
+RWTexture2D<float2> _SeedWrite;        // 写 seed（float2）
+Texture2D<float2>   _SeedRead;         // 读 seed（float2）
+
+RWTexture2D<float>  _DistanceWrite;    // 写距离（float）
+Texture2D<float>    _DistanceRead;     // 读距离（float）
+
+int _Width;
+int _Height;
+float _Threshold; // mask阈值，例如 0.5
+int _Step;        // JFA步长
+float _SmoothSpeed; // 平滑速度
+
+Texture2D<float> _DistancePrev;     // 上一帧平滑结果
+Texture2D<float> _DistanceTarget;   // 本帧新算出的 distOutRT（只读 SRV）
+RWTexture2D<float> _DistanceNext;   // 写出新的平滑结果
+
+// ... (existing kernels)
+
+float _MaxAlpha;     // 远处的最大 lerp 系数（0~1），比如 1.0
+float _EaseRange;    // 距离差达到该值时认为“很远”（像素单位），比如 16/32/64
+
+[numthreads(8,8,1)]
+void KSmooth(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= _Width || id.y >= _Height) return;
+
+    float current = _DistancePrev.Load(int3(id.xy, 0));
+    float target  = _DistanceTarget.Load(int3(id.xy, 0));
+
+    float diff = target - current;
+
+    // 0..1：越远越接近 1
+    float t = saturate(abs(diff) / max(_EaseRange, 1e-6));
+
+    // cubic ease-out：e = 1 - (1 - t)^3 （t小=>e小，t大=>e接近1）
+    float oneMinus = 1.0 - t;
+    float e = 1.0 - oneMinus * oneMinus * oneMinus;
+
+    // alpha：近处用 _SmoothSpeed，远处逼近 _MaxAlpha
+    float alpha = lerp(_SmoothSpeed, _MaxAlpha, e);
+
+    float next = current + diff * alpha;
+    _DistanceNext[id.xy] = next;
+}
+
+// 用来切换“字体像素作为feature”还是“背景像素作为feature”
+// 0 = 字体为feature（外部距离）
+// 1 = 背景为feature（内部距离）
+int _Invert;
+
+// 250/255
+static const float BIN_T = 0.9803922;
+
+[numthreads(8,8,1)]
+void KInit(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= _Width || id.y >= _Height) return;
+
+    float r = _Mask.Load(int3(id.xy, 0)).r;
+    bool isWhite = (r >= _Threshold);         // 使用传入的阈值
+    bool isFeature = (_Invert == 0) ? isWhite : !isWhite;
+
+    _SeedWrite[int2(id.xy)] = isFeature ? float2(id.x, id.y) : float2(-1.0, -1.0);
+}
+
+
+float sqrDist(float2 a, float2 b)
+{
+    float2 d = a - b;
+    return dot(d, d);
+}
+
+[numthreads(8,8,1)]
+void KJump(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= _Width || id.y >= _Height) return;
+
+    int2 p = int2(id.xy);
+
+    // 当前 best seed
+    float2 best = _SeedRead.Load(int3(p, 0));
+    float bestD = (best.x < 0) ? 1e30 : sqrDist(best, float2(p));
+
+    // 3x3 采样（步长 _Step）
+    [unroll]
+    for (int oy = -1; oy <= 1; oy++)
+    {
+        [unroll]
+        for (int ox = -1; ox <= 1; ox++)
+        {
+            int2 q = p + int2(ox, oy) * _Step;
+
+            // 正确的边界检查，而不是 clamp
+            if (q.x >= 0 && q.x < _Width && q.y >= 0 && q.y < _Height)
+            {
+                float2 cand = _SeedRead.Load(int3(q, 0));
+                if (cand.x >= 0)
+                {
+                    float d = sqrDist(cand, float2(p));
+                    if (d < bestD)
+                    {
+                        bestD = d;
+                        best = cand;
+                    }
+                }
+            }
+        }
+    }
+
+    _SeedWrite[p] = best;
+}
+
+[numthreads(8,8,1)]
+void KDistance(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= _Width || id.y >= _Height) return;
+
+    int2 p = int2(id.xy);
+    float2 seed = _SeedRead.Load(int3(p, 0));
+
+    if (seed.x < 0)
+    {
+        _DistanceWrite[p] = 1e6; // 没找到seed（一般不会发生，除非整张图全空）
+        return;
+    }
+
+    float dist = length(seed - float2(p)); // 像素单位
+    _DistanceWrite[p] = dist;
+}
