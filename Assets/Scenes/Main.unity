@@ -438,11 +438,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetYear: 2025
   targetMonth: 12
-  targetDay: 24
-  targetHour: 15
-  targetMinute: 37
+  targetDay: 26
+  targetHour: 0
+  targetMinute: 0
   targetSecond: 0
-  displayTimestamp: 1766561820
+  displayTimestamp: 1766678400
   _hours: 0
   _minutes: 0
   _seconds: 0
@@ -1829,11 +1829,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetYear: 2025
   targetMonth: 12
-  targetDay: 24
-  targetHour: 15
-  targetMinute: 24
+  targetDay: 25
+  targetHour: 12
+  targetMinute: 0
   targetSecond: 0
-  displayTimestamp: 1766561040
+  displayTimestamp: 1766635200
   _hours: 0
   _minutes: 0
   _seconds: 0
