@@ -29,9 +29,6 @@ public class Clock : MonoBehaviour
     [Range(0, 59)]
     public int targetSecond = 0;
 
-    [Header("倒计时设置")]
-    public float time = 0;
-
     [Header("只读信息")]
     [Tooltip("计算出的时间戳（Unix时间戳，秒）")]
     [SerializeField]
@@ -53,35 +50,33 @@ public class Clock : MonoBehaviour
     [SerializeField]
     private int _milliseconds = 0;
 
-    // 计算出的时间戳（Unix时间戳，秒）
-    private long targetTimestamp = 0;
-    
-    // 是否已经开始倒计时
-    private bool hasStarted = false;
+    // 目标日期时间
+    private DateTime targetDateTime;
 
     public int Hours => _hours;
     public int Minutes => _minutes;
     public int Seconds => _seconds;
     public int Milliseconds => _milliseconds;
 
+    public bool carryShowMinute = true; // 进位显示分钟, 20秒显示一分钟
+
     void OnValidate()
     {
-        // 当在检查器中修改值时，重新计算时间戳
-        CalculateTimestamp();
+        // 当在检查器中修改值时，重新计算目标时间
+        CalculateTargetTime();
     }
 
     void Start()
     {
-        CalculateTimestamp();
+        CalculateTargetTime();
     }
 
-    void CalculateTimestamp()
+    void CalculateTargetTime()
     {
         try
         {
-            DateTime targetDateTime = new DateTime(targetYear, targetMonth, targetDay, targetHour, targetMinute, targetSecond);
-            targetTimestamp = ((DateTimeOffset)targetDateTime).ToUnixTimeSeconds();
-            displayTimestamp = targetTimestamp;
+            targetDateTime = new DateTime(targetYear, targetMonth, targetDay, targetHour, targetMinute, targetSecond);
+            displayTimestamp = ((DateTimeOffset)targetDateTime).ToUnixTimeSeconds();
         }
         catch (ArgumentOutOfRangeException)
         {
@@ -91,33 +86,26 @@ public class Clock : MonoBehaviour
 
     void Update()
     {
-        // 检查当前系统时间是否已经超过目标时间戳
-        long currentTimestamp = ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds();
-        
-        if (currentTimestamp >= targetTimestamp)
+        // 计算当前系统时间与目标时间的差值
+        TimeSpan remaining = targetDateTime - DateTime.Now;
+
+        if (remaining.TotalMilliseconds <= 0)
         {
-            if (!hasStarted)
-            {
-                hasStarted = true;
-                Debug.Log($"倒计时开始！目标时间: {targetYear}-{targetMonth}-{targetDay} {targetHour}:{targetMinute}:{targetSecond}");
-            }
-            
-            time -= Time.deltaTime * 30;
-            
-            // 更新只读属性显示值
-            _hours = Mathf.FloorToInt((time+60) / 3600f);
-            _minutes = Mathf.FloorToInt((time+60) / 60f) % 60;
-            _seconds = Mathf.FloorToInt(time) % 60;
-            _milliseconds = Mathf.FloorToInt((time * 1000f) % 1000f);
+            // 如果时间已到或已过，全部归零
+            _hours = 0;
+            _minutes = 0;
+            _seconds = 0;
+            _milliseconds = 0;
         }
         else
         {
-            // 还未到达目标时间，显示等待状态
-            long remainingSeconds = targetTimestamp - currentTimestamp;
-            _hours = Mathf.FloorToInt(remainingSeconds / 3600f);
-            _minutes = Mathf.FloorToInt(remainingSeconds / 60f) % 60;
-            _seconds = Mathf.FloorToInt(remainingSeconds) % 60;
-            _milliseconds = 0;
+            // 更新倒计时显示值
+            // 使用 TotalHours 以便在超过24小时时显示总小时数
+            _seconds = remaining.Seconds;
+            int totalSeconds = (int)remaining.TotalSeconds;
+            _hours = carryShowMinute ? (totalSeconds+60)/60/60 : (int)remaining.TotalHours;
+            _minutes = carryShowMinute ? (totalSeconds+60)/60 : remaining.Minutes;
+            _milliseconds = remaining.Milliseconds;
         }
     }
 }
