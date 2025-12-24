@@ -9,11 +9,13 @@ public class CreateRT : MonoBehaviour
     public Camera cam;
     public RenderTexture rt;
 
+    public int fixedHeight = 1080;
+
     void ResetRT()
     {
         w = Screen.width;
         h = Screen.height;
-        rt = new RenderTexture(w, h, 0);
+        rt = new RenderTexture((int)((float)fixedHeight/h*w), fixedHeight, 0);
         rt.Create();
 
         cam.targetTexture = rt;

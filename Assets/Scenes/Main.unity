@@ -478,6 +478,7 @@ GameObject:
   - component: {fileID: 470718641}
   - component: {fileID: 470718645}
   - component: {fileID: 470718646}
+  - component: {fileID: 470718647}
   m_Layer: 6
   m_Name: Plane (1)
   m_TagString: Untagged
@@ -586,6 +587,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jfaDistanceField: {fileID: 1038889799}
   material: {fileID: 2100000, guid: 52a2fc288c7ce734b8f416cffd0be2be, type: 2}
+  rt: {fileID: 0}
 --- !u!210 &470718646
 SortingGroup:
   m_ObjectHideFlags: 0
@@ -598,6 +600,18 @@ SortingGroup:
   m_SortingLayer: 0
   m_SortingOrder: 100
   m_SortAtRoot: 0
+--- !u!114 &470718647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 470718640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0950049346fad1943a7ade7fd30b4f17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -1619,6 +1633,7 @@ MonoBehaviour:
   jfaDistanceField: {fileID: 1038889799}
   cam: {fileID: 2032653618}
   rt: {fileID: 0}
+  fixedHeight: 1080
 --- !u!1 &1051003623
 GameObject:
   m_ObjectHideFlags: 0

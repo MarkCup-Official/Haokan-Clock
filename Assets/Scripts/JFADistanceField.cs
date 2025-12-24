@@ -49,6 +49,7 @@ public class JFADistanceField : MonoBehaviour
 
     void AllocateIfNeeded()
     {
+        if(maskRT == null) return;
         int w = maskRT.width;
         int h = maskRT.height;
 
