@@ -49,7 +49,7 @@ Material:
     - _UseMaskClip: 1
     - _UsePalette: 0
     m_Colors:
-    - _FillColorA: {r: 0.0056269625, g: 0.709, b: 0, a: 1}
-    - _FillColorB: {r: 0.040764794, g: 0.495, b: 0, a: 1}
+    - _FillColorA: {r: 0, g: 0.2501659, b: 0.70980394, a: 1}
+    - _FillColorB: {r: 0, g: 0.18263616, b: 0.49411765, a: 1}
     - _LineColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

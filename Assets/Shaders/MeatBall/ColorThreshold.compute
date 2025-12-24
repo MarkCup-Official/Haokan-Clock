@@ -1,0 +1,28 @@
+#pragma kernel CSMain
+
+Texture2D<float4> _SourceTex;
+RWTexture2D<float4> _Result;
+
+float _ThresholdA;
+float _ThresholdB;
+float4 _ColorHigh;
+float4 _ColorMid;
+float4 _ColorLow;
+
+[numthreads(8, 8, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    uint width, height;
+    _SourceTex.GetDimensions(width, height);
+
+    if (id.x >= width || id.y >= height) return;
+
+    float r = _SourceTex.Load(int3(id.xy, 0)).r;
+
+    float4 col = (r > _ThresholdA) ? _ColorHigh :
+                 (r > _ThresholdB) ? _ColorMid :
+                 _ColorLow;
+
+    _Result[id.xy] = col;
+}
+
