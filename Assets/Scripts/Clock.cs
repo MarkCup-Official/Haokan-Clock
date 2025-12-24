@@ -32,7 +32,7 @@ public class Clock : MonoBehaviour
     [Header("只读信息")]
     [Tooltip("计算出的时间戳（Unix时间戳，秒）")]
     [SerializeField]
-    private long displayTimestamp = 0;
+    public long displayTimestamp = 0;
 
     [Tooltip("小时")]
     [SerializeField]
@@ -59,6 +59,8 @@ public class Clock : MonoBehaviour
     public int Milliseconds => _milliseconds;
 
     public bool carryShowMinute = true; // 进位显示分钟, 20秒显示一分钟
+
+    public long currentTimestamp;
 
     void OnValidate()
     {
@@ -89,6 +91,8 @@ public class Clock : MonoBehaviour
         // 计算当前系统时间与目标时间的差值
         TimeSpan remaining = targetDateTime - DateTime.Now;
 
+        currentTimestamp = ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds();
+
         if (remaining.TotalMilliseconds <= 0)
         {
             // 如果时间已到或已过，全部归零
@@ -104,7 +108,7 @@ public class Clock : MonoBehaviour
             _seconds = remaining.Seconds;
             int totalSeconds = (int)remaining.TotalSeconds;
             _hours = carryShowMinute ? (totalSeconds+60)/60/60 : (int)remaining.TotalHours;
-            _minutes = carryShowMinute ? (totalSeconds+60)/60 : remaining.Minutes;
+            _minutes = carryShowMinute ? (totalSeconds+60)/60%60 : remaining.Minutes;
             _milliseconds = remaining.Milliseconds;
         }
     }
